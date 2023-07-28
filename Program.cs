@@ -10,7 +10,8 @@ class Program
 
     static async Task Main(string[] args)
     {
-        Console.Write("Lütfen hava durumunu öğrenmek istediğiniz şehir adını girin: ");
+        while(true)
+        {Console.Write("Lütfen hava durumunu öğrenmek istediğiniz şehir adını girin: ");
         string? city = Console.ReadLine();
 
         var weatherData = await GetWeatherDataAsync(city);
@@ -20,6 +21,8 @@ class Program
             string weatherIcon = ParseWeatherIconFromResponse(weatherData);
             Console.WriteLine($"Hava durumu açıklaması: {weatherDescription} {weatherIcon}");
         }
+    }
+     Console.WriteLine("Uygulama kapatılıyor. İyi günler!");
     }
 
     static async Task<string> GetWeatherDataAsync(string? city)
@@ -43,7 +46,6 @@ response.EnsureSuccessStatusCode();
             return string.Empty;
         }
     }
-
     static string ParseWeatherDescriptionFromResponse(string response)
     {
         JObject jObject = JObject.Parse(response);
@@ -53,7 +55,7 @@ response.EnsureSuccessStatusCode();
     static string ParseWeatherIconFromResponse(string response)
 {
     JObject jObject = JObject.Parse(response);
-    string weatherDescription = (string)jObject["weather"][0]["description"];
+    string weatherDescription = (string?)jObject["weather"][0]["description"];
 
     // Hava durumu sembollerini temsil eden bir Dictionary oluşturuyoruz
     Dictionary<string, string> weatherIcons = new Dictionary<string, string>
@@ -69,15 +71,14 @@ response.EnsureSuccessStatusCode();
         { "snow", "🌨️" },
         { "mist", "🌫️" },
     };
-
-    // Eğer sembol bulunamazsa varsayılan sembolü kullanıyoruz
+    // Eğer sembol bulunamazsa varsayılan sembolü kullanılır.
     if (weatherIcons.TryGetValue(weatherDescription.ToLower(), out string weatherIcon))
     {
         return weatherIcon;
     }
     else
     {
-        return "🌈"; // Varsayılan sembol olarak gökkuşağı sembolü ekledik
+        return "🌈"; // Varsayılan sembol
     }
 }
 
