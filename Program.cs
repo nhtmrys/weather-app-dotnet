@@ -3,6 +3,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 
+
 class Program
 {
     const string ApiUrl = "https://api.openweathermap.org/data/2.5/weather";
@@ -10,19 +11,19 @@ class Program
 
     static async Task Main(string[] args)
     {
-        while(true)
-        {Console.Write("Lütfen hava durumunu öğrenmek istediğiniz şehir adını girin: ");
-        string? city = Console.ReadLine();
-
-        var weatherData = await GetWeatherDataAsync(city);
-        if (!string.IsNullOrEmpty(weatherData))
+        while (true)
         {
-            string weatherDescription = ParseWeatherDescriptionFromResponse(weatherData);
-            string weatherIcon = ParseWeatherIconFromResponse(weatherData);
-            Console.WriteLine($"Hava durumu açıklaması: {weatherDescription} {weatherIcon}");
+            Console.Write("Lütfen hava durumunu öğrenmek istediğiniz şehir adını girin: ");
+            string? city = Console.ReadLine();
+
+            var weatherData = await GetWeatherDataAsync(city);
+            if (!string.IsNullOrEmpty(weatherData))
+            {
+                string weatherDescription = ParseWeatherDescriptionFromResponse(weatherData);
+                string weatherIcon = ParseWeatherIconFromResponse(weatherData);
+                Console.WriteLine($"Hava durumu açıklaması: {weatherDescription} {weatherIcon}");
+            }
         }
-    }
-     Console.WriteLine("Uygulama kapatılıyor. İyi günler!");
     }
 
     static async Task<string> GetWeatherDataAsync(string? city)
@@ -32,10 +33,11 @@ class Program
         try
         {
             var response = await client.GetAsync($"{ApiUrl}?q={city}&appid={ApiKey}&units=metric");
-            if (response != null && response.IsSuccessStatusCode){
-response.EnsureSuccessStatusCode();
+            if (response != null && response.IsSuccessStatusCode)
+            {
+                response.EnsureSuccessStatusCode();
             }
-            
+
 
             string? responseBody = await response.Content.ReadAsStringAsync();
             return responseBody;
@@ -46,19 +48,19 @@ response.EnsureSuccessStatusCode();
             return string.Empty;
         }
     }
-    static string ParseWeatherDescriptionFromResponse(string response)
+    static string? ParseWeatherDescriptionFromResponse(string response)
     {
         JObject jObject = JObject.Parse(response);
         string weatherDescription = (string)jObject["weather"][0]["description"];
         return weatherDescription;
     }
-    static string ParseWeatherIconFromResponse(string response)
-{
-    JObject jObject = JObject.Parse(response);
-    string weatherDescription = (string?)jObject["weather"][0]["description"];
+    static string? ParseWeatherIconFromResponse(string response)
+    {
+        JObject jObject = JObject.Parse(response);
+        string? weatherDescription = (string)jObject["weather"][0]["description"];
 
-    // Hava durumu sembollerini temsil eden bir Dictionary oluşturuyoruz
-    Dictionary<string, string> weatherIcons = new Dictionary<string, string>
+        // Hava durumu sembollerini temsil eden bir Dictionary oluşturuyoruz
+        Dictionary<string, string> weatherIcons = new Dictionary<string, string>
     {
         { "clear sky", "☀️" },
         { "few clouds", "🌤️" },
@@ -70,16 +72,16 @@ response.EnsureSuccessStatusCode();
         { "thunderstorm", "⛈️" },
         { "snow", "🌨️" },
         { "mist", "🌫️" },
-    };
-    // Eğer sembol bulunamazsa varsayılan sembolü kullanılır.
-    if (weatherIcons.TryGetValue(weatherDescription.ToLower(), out string weatherIcon))
-    {
-        return weatherIcon;
-    }
-    else
-    {
-        return "🌈"; // Varsayılan sembol
-    }
-}
 
+    };
+                 // Eğer sembol bulunamazsa varsayılan sembolü kullanılır.
+        if (weatherIcons.TryGetValue(weatherDescription?.ToLower(), out string weatherIcon))
+        {
+            return weatherIcon;
+        }
+        else
+        {
+            return "🌈"; // Varsayılan sembol
+        }
+    }
 }
